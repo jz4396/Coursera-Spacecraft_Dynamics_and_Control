@@ -8,6 +8,16 @@ def tilde(x):
     x_tilde = np.array([[0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0]])
     return x_tilde
 
+def untilde(x_tilde):
+    """
+    Gets vector crossed with to recover a vector from a tilde matrix
+    """
+    x = np.zeros(3)
+    x[0] = x_tilde[2,1]
+    x[1] = x_tilde[0,2]
+    x[2] = x_tilde[1,0]
+    return x
+
 def rotated(dim, deg):
     """
     Gets the DCM matrix for a rotation of deg degrees about the dim axis
@@ -56,6 +66,13 @@ def dcm_2_quat(r):
     b3 = s3/abs(s3)*b3
     ep = [b0, b1, b2, b3]
     return ep
+
+def dcmdot_2_oemga(dcm1, dcm0, dt):
+    """
+    
+    """
+    dcm_dot = (dcm1-dcm0)/(dt)
+    return untilde(-dcm_dot@dcm1.transpose())
 
 def quat_2_dcm(q):
     """

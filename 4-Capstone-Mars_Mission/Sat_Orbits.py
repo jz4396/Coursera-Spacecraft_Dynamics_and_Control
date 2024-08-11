@@ -30,8 +30,12 @@ class Circular_Orbit:
 
     orbit_euler_func = lambda self, t: self.EA_i + [0,0, self.theta_dot*t]
     R_HN = lambda self, t: am.eulerA([3,1,3], self.orbit_euler_func(t))
+    R_RnN = lambda self, t: R_RnH@self.R_HN(t)
+    omega_RnN_N = lambda self, t: self.R_HN(t).transpose() @ self.omega_H_h
 
-    def orbit_2_inertial_state(self, t): 
+    def inertial_state(self, t):
+        # Returns inertial position in the N frame and
+        # velocity in the Hill frame
         R = self.R_HN(t).transpose()
         #print(euler_a,R)
         body_pos = np.array([self.r, 0, 0])
@@ -39,7 +43,7 @@ class Circular_Orbit:
 
         body_vel = np.array([0, self.theta_dot*self.r, 0])
         inertial_v = R @ body_vel
-        return np.array([[inertial_pos],[inertial_v]])
+        return np.array([inertial_pos,inertial_v])
 
    
 LMO_sat = Circular_Orbit(
@@ -53,6 +57,8 @@ GMO_sat = Circular_Orbit(h = 20424.2e3-R_mars,
                                        EA_i = np.deg2rad([0,0,250]),
 )
 
+# Nadir can be define in reference to Hill frame
+R_RnH = am.eulerAd([2],[180])
 R_RsN = am.eulerAd([1,2],[90,180])
 
 omega_RsN = np.zeros(3)
