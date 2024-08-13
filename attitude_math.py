@@ -59,11 +59,11 @@ def dcm_2_quat(r):
     b2 = np.sqrt(1/4*(1-np.trace(r)+2*r[1][1]))
     b3 = np.sqrt(1/4*(1-np.trace(r)+2*r[2][2]))
     s1 = r[1][2]-r[2][1]
-    b1 = s1/abs(s1)*b1
+    b1 = np.sign(s1)*b1
     s2 = r[2][0]-r[0][2]
-    b2 = s2/abs(s2)*b2
+    b2 = np.sign(s2)*b2
     s3 = r[0][1]-r[1][0]
-    b3 = s3/abs(s3)*b3
+    b3 = np.sign(s3)*b3
     ep = [b0, b1, b2, b3]
     return ep
 

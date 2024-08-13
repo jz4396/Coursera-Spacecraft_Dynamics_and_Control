@@ -35,8 +35,12 @@ class Circular_Orbit:
 
     X = lambda self: np.vstack([self.sigma_BN,self.omega_BN_B])
     orbit_euler_func = lambda self, t: self.EA_i + [0,0, self.theta_dot*t]
+
+    R_BN = lambda self: am.MRP_2_DCM(self.sigma_BN)
     R_HN = lambda self, t: am.eulerA([3,1,3], self.orbit_euler_func(t))
+    R_BH = lambda self, t: self.R_BN()@self.R_HN(t).transpose()
     R_RnN = lambda self, t: R_RnH@self.R_HN(t)
+    
     omega_RnN_N = lambda self, t: self.R_HN(t).transpose() @ self.omega_H_h
     
     def reset_X(self):
@@ -106,7 +110,14 @@ def orbital_att_RK4int(sat_obj, u, L, X0, ts):
         df.iloc[i+1]=(np.hstack([t,X_new.flatten()]))
         sat_obj.set_X(X_new)
     return df
-   
+
+def linear_control(X, Xr, t, K, P):
+    if callable(Xr):
+        Xr = Xr(t)
+    sigma_BR = am.DCM_2_MRP(am.MRP_2_DCM(X[0])@am.MRP_2_DCM(Xr[0]).transpose())
+    omega_BR_B = X[1]-Xr[1]
+    return - K*sigma_BR - P*omega_BR_B
+
 LMO_sat = Circular_Orbit(
     h = 400e3,
     EA_i = np.deg2rad([20, 30, 60]),
@@ -120,8 +131,10 @@ GMO_sat = Circular_Orbit(h = 20424.2e3-R_mars,
 
 # Nadir can be define in reference to Hill frame
 R_RnH = am.eulerAd([2],[180])
+MRP_RnH = am.DCM_2_MRP(R_RnH)
 # Sun pointing reference frame
 R_RsN = am.eulerAd([1,2],[90,180])
+MRP_RsN = am.DCM_2_MRP(R_RsN)
 
 omega_RsN = np.zeros(3)
 
