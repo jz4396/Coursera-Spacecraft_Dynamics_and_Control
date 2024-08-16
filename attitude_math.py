@@ -54,10 +54,12 @@ def dcm_2_quat(r):
     """
     Gets the quaternion rotation equivalent of dcm matrix r
     """
+    #print(r)
+    
     b0 = np.sqrt(1/4*(1+np.trace(r)))
-    b1 = np.sqrt(1/4*(1-np.trace(r)+2*r[0][0]))
-    b2 = np.sqrt(1/4*(1-np.trace(r)+2*r[1][1]))
-    b3 = np.sqrt(1/4*(1-np.trace(r)+2*r[2][2]))
+    b1 = np.sqrt(1/4*max([(1-np.trace(r)+2*r[0][0]),0]))
+    b2 = np.sqrt(1/4*max([(1-np.trace(r)+2*r[1][1]),0]))
+    b3 = np.sqrt(1/4*max([(1-np.trace(r)+2*r[2][2]),0]))
     s1 = r[1][2]-r[2][1]
     b1 = np.sign(s1)*b1
     s2 = r[2][0]-r[0][2]

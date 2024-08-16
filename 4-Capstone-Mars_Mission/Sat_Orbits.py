@@ -116,6 +116,7 @@ def linear_control(X, Xr, t, K, P):
         Xr = Xr(t)
     sigma_BR = am.DCM_2_MRP(am.MRP_2_DCM(X[0])@am.MRP_2_DCM(Xr[0]).transpose())
     omega_BR_B = X[1]-Xr[1]
+    
     return - K*sigma_BR - P*omega_BR_B
 
 LMO_sat = Circular_Orbit(
